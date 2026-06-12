@@ -37,12 +37,12 @@ const useStyles = makeStyles({
   navButton: {
     fontSize: '11px',
     fontWeight: 'normal',
-    paddingTop: '2px',
-    paddingBottom: '2px',
-    paddingLeft: '4px !important',
-    paddingRight: '4px !important',
-    minWidth: 'auto !important',
-    minHeight: 'auto !important',
+    paddingTop: '4px',
+    paddingBottom: '4px',
+    paddingLeft: '6px !important',
+    paddingRight: '6px !important',
+    minWidth: '24px',
+    minHeight: '24px',
     borderRadius: tokens.borderRadiusMedium,
 
     // Standard-Zustand (Unselected)

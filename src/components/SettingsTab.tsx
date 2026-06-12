@@ -9,12 +9,12 @@ const useStyles = makeStyles({
   container: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px', // Reduzierter Abstand zwischen den Hauptbereichen (vorher 24px)
+    gap: '16px',
   },
   section: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '6px', // Deutlich reduzierter Abstand zwischen den einzelnen Zeilen
+    gap: '6px',
   },
   heading: {
     fontSize: '11px',
@@ -23,7 +23,7 @@ const useStyles = makeStyles({
   },
   divider: {
     marginTop: '2px',
-    marginBottom: '4px', // Kompaktere Abstände um die Linie
+    marginBottom: '4px',
   },
   row: {
     display: 'flex',
@@ -34,19 +34,19 @@ const useStyles = makeStyles({
   // --- CSS Trick für das "cm" im Input ---
   spinContainer: {
     position: 'relative',
-    width: '75px', // Kompakte Breite für die Zahlen
+    width: '85px', // NEU: Etwas breiter gemacht (vorher 75px)
   },
   spinButton: {
     width: '100%',
   },
   cmSuffix: {
     position: 'absolute',
-    right: '24px', // Positioniert das "cm" exakt links neben den Pfeilen des SpinButtons
+    right: '30px', // NEU: Weiter nach links verschoben (vorher 24px)
     top: '50%',
     transform: 'translateY(-50%)',
     fontSize: '11px',
-    color: tokens.colorNeutralForeground3, // Leichtes Grau
-    pointerEvents: 'none', // WICHTIG: Klicks gehen durch den Text hindurch ins Eingabefeld
+    color: tokens.colorNeutralForeground3,
+    pointerEvents: 'none',
   },
   // ---------------------------------------
 
@@ -95,7 +95,6 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
   };
 
   const handleMarginChange = (side: keyof typeof margins, _event: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-    // Falls das Feld komplett geleert wird, setzen wir es auf 0
     const val = data.value !== undefined ? data.value : 0;
     setMargins(prev => ({ ...prev, [side]: val }));
     saveSetting(`margin${side.charAt(0).toUpperCase() + side.slice(1)}`, val);
@@ -123,8 +122,9 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
               value={margins.top}
               onChange={(e, d) => handleMarginChange('top', e, d)}
               className={classes.spinButton}
-              appearance="underline" // Flaches, unauffälliges Design
-              step={0.01} // Erlaubt 2 Nachkommastellen
+              appearance="filled-lighter" // NEU: Gefüllter, heller Hintergrund
+              size="small"                // NEU: Kompaktere Größe
+              step={0.01}
               min={0}
             />
             <span className={classes.cmSuffix}>cm</span>
@@ -138,7 +138,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
               value={margins.bottom}
               onChange={(e, d) => handleMarginChange('bottom', e, d)}
               className={classes.spinButton}
-              appearance="underline"
+              appearance="filled-lighter"
+              size="small"
               step={0.01}
               min={0}
             />
@@ -153,7 +154,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
               value={margins.left}
               onChange={(e, d) => handleMarginChange('left', e, d)}
               className={classes.spinButton}
-              appearance="underline"
+              appearance="filled-lighter"
+              size="small"
               step={0.01}
               min={0}
             />
@@ -168,7 +170,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
               value={margins.right}
               onChange={(e, d) => handleMarginChange('right', e, d)}
               className={classes.spinButton}
-              appearance="underline"
+              appearance="filled-lighter"
+              size="small"
               step={0.01}
               min={0}
             />
@@ -191,7 +194,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
             onChange={handleUrlChange}
             className={classes.urlInput}
             placeholder="https://..."
-            appearance="underline" // Flaches Design auch für die URL
+            appearance="filled-lighter" // NEU: Gefüllter, heller Hintergrund
+            size="small"                // NEU: Kompaktere Größe
           />
         </div>
 
