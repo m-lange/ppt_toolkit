@@ -2,53 +2,39 @@ import React, { useState } from 'react';
 import {
   FluentProvider,
   createLightTheme,
-  TabList,
-  Tab,
+  Button,
   makeStyles,
+  mergeClasses,
   tokens,
   type BrandVariants,
-  type Theme,
-  type SelectTabData,
-  type SelectTabEvent
+  type Theme
 } from '@fluentui/react-components';
-import { SettingsRegular, ImageRegular } from '@fluentui/react-icons';
+import { SettingsRegular } from '@fluentui/react-icons';
 import { TemplatesTab } from './components/TemplatesTab';
 import { SettingsTab } from './components/SettingsTab';
 import { IconsTab } from './components/IconsTab';
 
-
 const brandTheme: BrandVariants = {
-  10: "#020401",
-  20: "#101C0F",
-  30: "#152F17",
-  40: "#173D1C",
-  50: "#194B20",
-  60: "#1A5A25",
-  70: "#1A692A",
-  80: "#19782E",
-  90: "#168833",
-  100: "#119938",
-  110: "#07A93C",
-  120: "#34B84E",
-  130: "#60C46B",
-  140: "#82D087",
-  150: "#A2DCA3",
-  160: "#BFE7BF"
+  10: "#020401", 20: "#101C0F", 30: "#152F17", 40: "#173D1C",
+  50: "#194B20", 60: "#1A5A25", 70: "#1A692A", 80: "#19782E",
+  90: "#168833", 100: "#119938", 110: "#07A93C", 120: "#34B84E",
+  130: "#60C46B", 140: "#82D087", 150: "#A2DCA3", 160: "#BFE7BF"
 };
 
-// 2. Theme anpassen: Globale Schriftgröße auf 12px setzen
 const powerPointTheme: Theme = {
   ...createLightTheme(brandTheme),
   fontSizeBase300: "12px",
 };
 
-// 3. Custom Styles für die Tabs definieren
+// 2. Custom Styles für unsere eigene Button-Navigation
 const useStyles = makeStyles({
-  tabList: {
+  navBar: {
+    display: 'flex',
     width: '100%',
     columnGap: '4px',
+    alignItems: 'center',
   },
-  customTab: {
+  navButton: {
     fontSize: '11px',
     fontWeight: 'bold',
     paddingTop: '2px',
@@ -58,76 +44,92 @@ const useStyles = makeStyles({
     minHeight: '26px',
     borderRadius: tokens.borderRadiusMedium,
 
-    color: tokens.colorNeutralForeground2,
+    // Standard-Zustand (Unselected)
+    color: tokens.colorNeutralForeground2, // Grau
     backgroundColor: 'transparent',
 
-    '&::after': {
-      display: 'none !important',
-    },
-
+    // Hover für UNSELECTED
     '&:hover': {
-      color: tokens.colorNeutralForeground1,
-      backgroundColor: 'transparent',
+      color: `${tokens.colorNeutralForeground1} !important`, // Schwarz
+      backgroundColor: 'transparent !important', // Kein grauer Hintergrund beim Hover
     },
+  },
 
-    '&[aria-selected="true"]': {
-      backgroundColor: tokens.colorBrandBackground2,
-      color: tokens.colorBrandForeground1,
-    },
+  // Diese Klasse wird nur angehängt, wenn der Button aktiv ist
+  navButtonActive: {
+    backgroundColor: `${tokens.colorBrandBackground2} !important`, // Heller Akzent
+    color: `${tokens.colorBrandForeground1} !important`, // Akzentfarbe (Orange)
 
-    '&[aria-selected="true"]:hover': {
-      backgroundColor: tokens.colorBrandBackground2,
-      color: tokens.colorBrandForeground1,
-    },
+    // Hover für SELECTED (bleibt exakt gleich)
+    '&:hover': {
+      backgroundColor: `${tokens.colorBrandBackground2} !important`,
+      color: `${tokens.colorBrandForeground1} !important`,
+    }
+  },
+
+  settingsButton: {
+    marginLeft: 'auto', // Drückt den Settings-Button nach rechts
   }
 });
-
 
 export const App: React.FC = () => {
   const classes = useStyles();
   const [selectedValue, setSelectedValue] = useState<string>('templates');
 
-  const onTabSelect = (_event: SelectTabEvent, data: SelectTabData) => {
-    setSelectedValue(data.value as string);
-  };
-
   return (
     <FluentProvider theme={powerPointTheme}>
       <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', height: '100vh', boxSizing: 'border-box' }}>
 
-        <TabList
-          selectedValue={selectedValue}
-          onTabSelect={onTabSelect}
-          className={classes.tabList}
-        >
-          <Tab
-            value="templates"
-            className={classes.customTab}
+        {/* Unsere eigene Navigationsleiste */}
+        <div className={classes.navBar} role="tablist">
+
+          <Button
+            appearance="transparent"
+            role="tab"
+            // mergeClasses kombiniert die Standard-Klasse mit der Active-Klasse (falls ausgewählt)
+            className={mergeClasses(
+              classes.navButton,
+              selectedValue === 'templates' && classes.navButtonActive
+            )}
+            onClick={() => setSelectedValue('templates')}
           >
             Templates
-          </Tab>
+          </Button>
 
-          <Tab
-            value="icons"
-            className={classes.customTab}
+          <Button
+            appearance="transparent"
+            role="tab"
+            className={mergeClasses(
+              classes.navButton,
+              selectedValue === 'icons' && classes.navButtonActive
+            )}
+            onClick={() => setSelectedValue('icons')}
           >
             Symbole
-          </Tab>
+          </Button>
 
-          <Tab
-            value="settings"
+          <Button
+            appearance="transparent"
+            role="tab"
             icon={<SettingsRegular />}
             aria-label="Settings"
-            className={classes.customTab}
-            style={{ marginLeft: 'auto' }}
+            className={mergeClasses(
+              classes.navButton,
+              classes.settingsButton,
+              selectedValue === 'settings' && classes.navButtonActive
+            )}
+            onClick={() => setSelectedValue('settings')}
           />
-        </TabList>
 
+        </div>
+
+        {/* Content-Bereich */}
         <div style={{ flex: 1, marginTop: '16px', overflow: 'hidden' }}>
           {selectedValue === 'templates' && <TemplatesTab />}
           {selectedValue === 'icons' && <IconsTab />}
           {selectedValue === 'settings' && <SettingsTab />}
         </div>
+
       </div>
     </FluentProvider>
   );
