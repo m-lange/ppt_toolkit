@@ -36,11 +36,11 @@ const useStyles = makeStyles({
   },
   navButton: {
     fontSize: '11px',
-    fontWeight: 'bold',
+    fontWeight: 'normal',
     paddingTop: '2px',
     paddingBottom: '2px',
-    paddingLeft: '12px',
-    paddingRight: '12px',
+    paddingLeft: '6px',
+    paddingRight: '6px',
     minHeight: '26px',
     borderRadius: tokens.borderRadiusMedium,
 
@@ -50,6 +50,7 @@ const useStyles = makeStyles({
 
     // Hover für UNSELECTED
     '&:hover': {
+      fontWeight: 'bold !important',
       color: `${tokens.colorNeutralForeground1} !important`, // Schwarz
       backgroundColor: 'transparent !important', // Kein grauer Hintergrund beim Hover
     },
@@ -57,6 +58,7 @@ const useStyles = makeStyles({
 
   // Diese Klasse wird nur angehängt, wenn der Button aktiv ist
   navButtonActive: {
+    fontWeight: 'bold !important',
     backgroundColor: `${tokens.colorBrandBackground2} !important`, // Heller Akzent
     color: `${tokens.colorBrandForeground1} !important`, // Akzentfarbe (Orange)
 
