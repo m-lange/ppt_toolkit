@@ -44,39 +44,28 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
   const [displayMargins, setDisplayMargins] = useState({ top: "0", bottom: "0", left: "0", right: "0" });
   const [iconUrl, setIconUrl] = useState('');
 
-  // NEU: Hilfsfunktion für das hybride Laden (Document -> LocalStorage -> Default)
   const loadSetting = (key: string, defaultValue: any, isNumber: boolean = false) => {
     let val: any = null;
-
-    // 1. Priorität: Document Settings (aktuelle Präsentation)
     if (typeof Office !== 'undefined' && Office.context && Office.context.document) {
       val = Office.context.document.settings.get(key);
     }
-
-    // 2. Priorität: LocalStorage (Gerätespezifisch), falls im Dokument nichts steht
     if (val === null || val === undefined || val === '') {
       const localVal = localStorage.getItem(`ppt_${key}`);
       if (localVal !== null && localVal !== '') {
         val = isNumber ? parseFloat(localVal) : localVal;
       }
     }
-
-    // 3. Priorität: Fallback auf Standardwert
     if (val === null || val === undefined || val === '' || (isNumber && isNaN(val))) {
       val = defaultValue;
     }
-
     return val;
   };
 
-  // NEU: Hilfsfunktion für das hybride Speichern (in Document UND LocalStorage)
   const saveSetting = (key: string, value: any) => {
-    // Im Dokument speichern
     if (typeof Office !== 'undefined' && Office.context && Office.context.document) {
       Office.context.document.settings.set(key, value);
       Office.context.document.settings.saveAsync();
     }
-    // Auf dem Gerät speichern
     localStorage.setItem(`ppt_${key}`, String(value));
   };
 
@@ -129,24 +118,38 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
     };
   }, []);
 
-  const handleMarginChange = (side: keyof typeof margins, _event: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-    if (data.displayValue !== undefined) {
-      setDisplayMargins(prev => ({ ...prev, [side]: data.displayValue! }));
+  // FIX: Unterscheidet zwischen Tippen und Klicken!
+  const handleMarginChange = (side: keyof typeof margins, event: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
+    // 1. Wenn der Nutzer tippt (Event ist 'change')
+    if (event.type === 'change') {
+      if (data.displayValue !== undefined) {
+        setDisplayMargins(prev => ({ ...prev, [side]: data.displayValue! }));
+      }
     }
-    if (data.value !== undefined && data.value !== null && !isNaN(data.value)) {
-      setMargins(prev => ({ ...prev, [side]: data.value! }));
-      setDisplayMargins(prev => ({ ...prev, [side]: String(data.value!) }));
-      saveSetting(`margin${side.charAt(0).toUpperCase() + side.slice(1)}`, data.value);
+    // 2. Wenn der Nutzer auf die Pfeile klickt oder Pfeiltasten nutzt
+    else {
+      if (data.value !== undefined && data.value !== null && !isNaN(data.value)) {
+        setMargins(prev => ({ ...prev, [side]: data.value! }));
+        setDisplayMargins(prev => ({ ...prev, [side]: String(data.value!) }));
+        saveSetting(`margin${side.charAt(0).toUpperCase() + side.slice(1)}`, data.value);
+      }
     }
   };
 
+  // FIX: Speichert die getippte Zahl, wenn man das Feld verlässt
   const handleMarginBlur = (side: keyof typeof margins) => {
-    const parsed = parseFloat(displayMargins[side].replace(',', '.'));
+    let textValue = displayMargins[side].trim();
+    if (textValue === '') textValue = '0'; // Leeres Feld wird zu 0
+
+    // Ersetzt Komma durch Punkt (für deutsche Tastaturen) und wandelt in Zahl um
+    const parsed = parseFloat(textValue.replace(',', '.'));
+
     if (!isNaN(parsed)) {
       setMargins(prev => ({ ...prev, [side]: parsed }));
       setDisplayMargins(prev => ({ ...prev, [side]: String(parsed) }));
       saveSetting(`margin${side.charAt(0).toUpperCase() + side.slice(1)}`, parsed);
     } else {
+      // Falls Quatsch eingetippt wurde, auf letzten gültigen Wert zurücksetzen
       setDisplayMargins(prev => ({ ...prev, [side]: String(margins[side]) }));
     }
   };
