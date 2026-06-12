@@ -19,7 +19,7 @@ import { insertSvgIcon } from '../utils/powerpointApi';
 const useStyles = makeStyles({
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(48px, 1fr))',
     gap: '6px',
     padding: '4px 0',
   },
@@ -28,7 +28,7 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '50px',
+    height: '48px',
     border: 'none',
     borderRadius: tokens.borderRadiusMedium,
     backgroundColor: tokens.colorNeutralBackground3,
