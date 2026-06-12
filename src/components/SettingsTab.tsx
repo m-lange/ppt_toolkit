@@ -118,38 +118,42 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
     };
   }, []);
 
-  // FIX: Unterscheidet zwischen Tippen und Klicken!
+// Verarbeitet JEDE Änderung (Tippen UND Pfeil-Klicks)
   const handleMarginChange = (side: keyof typeof margins, event: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-    // 1. Wenn der Nutzer tippt (Event ist 'change')
-    if (event.type === 'change') {
-      if (data.displayValue !== undefined) {
-        setDisplayMargins(prev => ({ ...prev, [side]: data.displayValue! }));
+    // 1. Wenn der Nutzer tippt (data.value ist meist undefined, da noch keine valide Zahl)
+    if (data.displayValue !== undefined) {
+      setDisplayMargins(prev => ({ ...prev, [side]: data.displayValue! }));
+
+      // Versuchen, den getippten Wert im Hintergrund als Zahl zu parsen
+      const parsed = parseFloat(data.displayValue.replace(',', '.'));
+      if (!isNaN(parsed)) {
+        setMargins(prev => ({ ...prev, [side]: parsed }));
       }
     }
-    // 2. Wenn der Nutzer auf die Pfeile klickt oder Pfeiltasten nutzt
-    else {
-      if (data.value !== undefined && data.value !== null && !isNaN(data.value)) {
-        setMargins(prev => ({ ...prev, [side]: data.value! }));
-        setDisplayMargins(prev => ({ ...prev, [side]: String(data.value!) }));
-        saveSetting(`margin${side.charAt(0).toUpperCase() + side.slice(1)}`, data.value);
-      }
+    // 2. Wenn der Nutzer die Pfeiltasten/Buttons nutzt (Fluent UI liefert eine fertige Zahl)
+    else if (data.value !== undefined && data.value !== null && !isNaN(data.value)) {
+      setMargins(prev => ({ ...prev, [side]: data.value! }));
+      setDisplayMargins(prev => ({ ...prev, [side]: String(data.value!) }));
+      saveSetting(`margin${side.charAt(0).toUpperCase() + side.slice(1)}`, data.value);
     }
   };
 
-  // FIX: Speichert die getippte Zahl, wenn man das Feld verlässt
+  // Sichert den Wert endgültig, wenn das Feld verlassen wird
   const handleMarginBlur = (side: keyof typeof margins) => {
     let textValue = displayMargins[side].trim();
-    if (textValue === '') textValue = '0'; // Leeres Feld wird zu 0
+    if (textValue === '') textValue = '0';
 
-    // Ersetzt Komma durch Punkt (für deutsche Tastaturen) und wandelt in Zahl um
     const parsed = parseFloat(textValue.replace(',', '.'));
 
     if (!isNaN(parsed)) {
-      setMargins(prev => ({ ...prev, [side]: parsed }));
-      setDisplayMargins(prev => ({ ...prev, [side]: String(parsed) }));
-      saveSetting(`margin${side.charAt(0).toUpperCase() + side.slice(1)}`, parsed);
+      // Runden auf 2 Nachkommastellen (passend zu step={0.01})
+      const fixedParsed = Math.round(parsed * 100) / 100;
+
+      setMargins(prev => ({ ...prev, [side]: fixedParsed }));
+      setDisplayMargins(prev => ({ ...prev, [side]: String(fixedParsed) }));
+      saveSetting(`margin${side.charAt(0).toUpperCase() + side.slice(1)}`, fixedParsed);
     } else {
-      // Falls Quatsch eingetippt wurde, auf letzten gültigen Wert zurücksetzen
+      // Fallback bei ungültiger Eingabe
       setDisplayMargins(prev => ({ ...prev, [side]: String(margins[side]) }));
     }
   };
@@ -194,7 +198,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
             <SpinButton
               value={margins.top}
               displayValue={displayMargins.top}
-              onChange={(e, d) => handleMarginChange('top', e, d)}
+              onChange={(e, d) => handleMarginChange('top', e, d)}<-- NEU
               onBlur={() => handleMarginBlur('top')}
               className={classes.spinButton}
               appearance="filled-darker"
