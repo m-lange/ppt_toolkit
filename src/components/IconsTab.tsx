@@ -117,7 +117,7 @@ export const IconsTab: React.FC = () => {
             Keine Icons gefunden.
           </div>
         ) : (
-          <Accordion multiple collapsible defaultOpenItems={filteredCategories.map(c => c.catagory)}>
+          <Accordion multiple collapsible defaultOpenItems={filteredCategories.map(c => c.category)}>
             {filteredCategories.map((category, index) => (
               <AccordionItem value={category.category} key={index}>
                 <AccordionHeader>{category.category}</AccordionHeader>
