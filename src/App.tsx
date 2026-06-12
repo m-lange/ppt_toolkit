@@ -14,6 +14,7 @@ import { SettingsRegular } from '@fluentui/react-icons';
 
 import { TemplatesTab } from './components/TemplatesTab';
 import { SettingsTab } from './components/SettingsTab';
+import { IconsTab } from './components/IconsTab';
 
 
 const powerPointBrand: BrandVariants = {
@@ -55,7 +56,6 @@ export const App: React.FC<AppProps> = ({ }) => {
     <FluentProvider theme={powerPointTheme}>
       <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', height: '100vh', boxSizing: 'border-box' }}>
 
-        {/* size="small" macht die Tabs kompakter */}
         <TabList
           selectedValue={selectedValue}
           onTabSelect={onTabSelect}
@@ -63,6 +63,7 @@ export const App: React.FC<AppProps> = ({ }) => {
           style={{ width: '100%' }}
         >
           <Tab value="templates">Templates</Tab>
+          <Tab value="icons">Symbole</Tab>
           <Tab
             value="settings"
             icon={<SettingsRegular />}
@@ -73,6 +74,7 @@ export const App: React.FC<AppProps> = ({ }) => {
 
         <div style={{ flex: 1, marginTop: '16px' }}>
           {selectedValue === 'templates' && <TemplatesTab />}
+          {selectedValue === 'icons' && <IconsTab />}
           {selectedValue === 'settings' && <SettingsTab />}
         </div>
       </div>

@@ -76,12 +76,12 @@
         <bt:Url id="TaskpaneUrl" DefaultValue="https://m-lange.github.io/ppt_toolkit/index.html" />
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="CommandsGroupLabel" DefaultValue="Templates" />
-        <bt:String id="TaskpaneButtonLabel" DefaultValue="PPT Toolkit" />
-        <bt:String id="TaskpaneButtonTitle" DefaultValue="PPT Toolkit" />
+        <bt:String id="CommandsGroupLabel" DefaultValue="Add-ins" />
+        <bt:String id="TaskpaneButtonLabel" DefaultValue="Toolkit" />
+        <bt:String id="TaskpaneButtonTitle" DefaultValue="Toolkit" />
       </bt:ShortStrings>
       <bt:LongStrings>
-        <bt:String id="TaskpaneButtonDesc" DefaultValue="Opens the templates sidebar." />
+        <bt:String id="TaskpaneButtonDesc" DefaultValue="Das PowerPoint Toolkit öffnen." />
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>

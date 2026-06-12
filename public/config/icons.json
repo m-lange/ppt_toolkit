@@ -1,0 +1,8 @@
+{
+  "version": "1.0",
+  "description": "Hauptkonfiguration für alle Add-In Icons",
+  "files": [
+    "./config/icons/basic-shapes.json",
+    "./config/icons/business-icons.json"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "category": "Basisformen",
+  "icons": [
+    {
+      "name": "Kreis",
+      "keywords": ["rund", "ellipse", "punkt", "circle"],
+      "svg": [
+        "<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'>",
+        "  <circle cx='50' cy='50' r='50' fill='currentColor'/>",
+        "</svg>"
+      ]
+    },
+    {
+      "name": "Zahnrad (Extern)",
+      "keywords": ["einstellungen", "settings"],
+      "svg": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Settings/SVG/ic_fluent_settings_24_regular.svg"
+    }
+  ]
+}
