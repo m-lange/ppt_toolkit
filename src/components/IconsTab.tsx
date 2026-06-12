@@ -46,6 +46,15 @@ const useStyles = makeStyles({
       width: '32px',
       height: '32px',
     }
+  },
+  searchBox: {
+    backgroundColor: tokens.colorNeutralBackground3, // Gleiches Grau wie die Buttons
+    borderRadius: tokens.borderRadiusMedium, // Runde Ecken
+
+    // Optional: Versteckt den farbigen Strich am unteren Rand, wenn man reinklickt
+    '&::after': {
+      display: 'none',
+    }
   }
 });
 
@@ -152,8 +161,8 @@ export const IconsTab: React.FC = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
       <SearchBox
-        appearance="underline"
-        placeholder="Icons suchen..."
+        appearance="filled-darker"
+        placeholder="Symbole suchen..."
         onChange={handleSearchChange}
       />
 

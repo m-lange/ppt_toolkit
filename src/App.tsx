@@ -50,24 +50,42 @@ const useStyles = makeStyles({
     columnGap: '4px',
   },
   customTab: {
+    // 1. Globale Typografie für den Tab erzwingen
     fontSize: '11px',
     fontWeight: 'bold',
-    color: tokens.colorNeutralForeground2,
-    borderRadius: tokens.borderRadiusMedium,
-    padding: '4px 12px',
-    minHeight: '32px',
 
-    // NEU: Versteckt den standardmäßigen Unterstrich (Indicator) von Fluent UI
+    // 2. Abstände oben/unten reduzieren (kompakterer Look)
+    paddingTop: '2px',
+    paddingBottom: '2px',
+    paddingLeft: '12px',
+    paddingRight: '12px',
+    minHeight: '26px', // Vorher 32px
+    borderRadius: tokens.borderRadiusMedium,
+
+    // 3. Standard-Zustand (Unselected)
+    color: tokens.colorNeutralForeground2,
+    backgroundColor: 'transparent',
+
+    // Versteckt den standardmäßigen Unterstrich
     '&::after': {
       display: 'none',
     },
 
+    // 4. Hover-Zustand für UNSELECTED Tabs
     '&:hover': {
       backgroundColor: tokens.colorNeutralBackground1Hover,
+      color: tokens.colorNeutralForeground2Hover, // Erzwingt, dass die Farbe beim Hovern dunkelgrau bleibt
     },
 
+    // 5. Zustand für SELECTED Tabs
     '&[aria-selected="true"]': {
       backgroundColor: tokens.colorBrandBackground2,
+      color: tokens.colorBrandForeground1,
+    },
+
+    // 6. Hover-Zustand für SELECTED Tabs (damit es beim Drüberfahren stimmig bleibt)
+    '&[aria-selected="true"]:hover': {
+      backgroundColor: tokens.colorBrandBackground2Hover,
       color: tokens.colorBrandForeground1,
     },
   }
