@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: pages-build-deployment
 
 # Die Action wird ausgeführt, sobald du Code in den "main" Branch pushst
 on:
