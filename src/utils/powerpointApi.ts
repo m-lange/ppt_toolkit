@@ -219,3 +219,58 @@ export const exportSelectedShapeToJson = async (): Promise<void> => {
     console.error("Fehler beim Exportieren des Shapes:", error);
   }
 };
+
+
+// ... deine bisherigen Funktionen bleiben hier ...
+
+// NEU: Ränder eines selektierten Objekts berechnen
+export const getMarginsFromSelection = async (): Promise<{top: number, bottom: number, left: number, right: number} | null> => {
+  try {
+    return await PowerPoint.run(async (context) => {
+      const shapes = context.presentation.getSelectedShapes();
+      shapes.load("items");
+      await context.sync();
+
+      // Prüfen, ob überhaupt ein Objekt ausgewählt ist
+      if (shapes.items.length === 0) {
+        return null;
+      }
+
+      const shape = shapes.items[0];
+      shape.load(["left", "top", "width", "height"]);
+
+      // Standardmaße für 16:9 (falls PageSetup nicht verfügbar ist)
+      let slideWidth = 960;
+      let slideHeight = 540;
+
+      if (context.presentation.pageSetup) {
+        const pageSetup = context.presentation.pageSetup;
+        pageSetup.load(["slideWidth", "slideHeight"]);
+        await context.sync();
+        slideWidth = pageSetup.slideWidth;
+        slideHeight = pageSetup.slideHeight;
+      } else {
+        await context.sync();
+      }
+
+      // Umrechnungsfaktor: 1 cm = 28.3464567 Punkte (pt)
+      const ptToCm = 28.3464567;
+
+      const leftCm = shape.left / ptToCm;
+      const topCm = shape.top / ptToCm;
+      const rightCm = (slideWidth - (shape.left + shape.width)) / ptToCm;
+      const bottomCm = (slideHeight - (shape.top + shape.height)) / ptToCm;
+
+      // Werte auf 2 Nachkommastellen runden und negative Werte (falls Objekt außerhalb der Folie liegt) auf 0 setzen
+      return {
+        top: Number(Math.max(0, topCm).toFixed(2)),
+        bottom: Number(Math.max(0, bottomCm).toFixed(2)),
+        left: Number(Math.max(0, leftCm).toFixed(2)),
+        right: Number(Math.max(0, rightCm).toFixed(2))
+      };
+    });
+  } catch (error) {
+    console.error("Fehler beim Auslesen der Ränder:", error);
+    return null;
+  }
+};
