@@ -38,39 +38,68 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
   const classes = useStyles();
 
   const [isLoaded, setIsLoaded] = useState(false);
-
-  // NEU: State, der speichert, ob exakt 1 Objekt selektiert ist
   const [isSingleShapeSelected, setIsSingleShapeSelected] = useState(false);
 
   const [margins, setMargins] = useState({ top: 0, bottom: 0, left: 0, right: 0 });
   const [displayMargins, setDisplayMargins] = useState({ top: "0", bottom: "0", left: "0", right: "0" });
   const [iconUrl, setIconUrl] = useState('');
 
-  // 1. Effect: Lädt die gespeicherten Settings beim Start
-  useEffect(() => {
+  // NEU: Hilfsfunktion für das hybride Laden (Document -> LocalStorage -> Default)
+  const loadSetting = (key: string, defaultValue: any, isNumber: boolean = false) => {
+    let val: any = null;
+
+    // 1. Priorität: Document Settings (aktuelle Präsentation)
     if (typeof Office !== 'undefined' && Office.context && Office.context.document) {
-      const settings = Office.context.document.settings;
-      const loadedMargins = {
-        top: settings.get('marginTop') || 0,
-        bottom: settings.get('marginBottom') || 0,
-        left: settings.get('marginLeft') || 0,
-        right: settings.get('marginRight') || 0,
-      };
-
-      setMargins(loadedMargins);
-      setDisplayMargins({
-        top: String(loadedMargins.top),
-        bottom: String(loadedMargins.bottom),
-        left: String(loadedMargins.left),
-        right: String(loadedMargins.right),
-      });
-
-      setIconUrl(settings.get('iconUrl') || '');
+      val = Office.context.document.settings.get(key);
     }
+
+    // 2. Priorität: LocalStorage (Gerätespezifisch), falls im Dokument nichts steht
+    if (val === null || val === undefined || val === '') {
+      const localVal = localStorage.getItem(`ppt_${key}`);
+      if (localVal !== null && localVal !== '') {
+        val = isNumber ? parseFloat(localVal) : localVal;
+      }
+    }
+
+    // 3. Priorität: Fallback auf Standardwert
+    if (val === null || val === undefined || val === '' || (isNumber && isNaN(val))) {
+      val = defaultValue;
+    }
+
+    return val;
+  };
+
+  // NEU: Hilfsfunktion für das hybride Speichern (in Document UND LocalStorage)
+  const saveSetting = (key: string, value: any) => {
+    // Im Dokument speichern
+    if (typeof Office !== 'undefined' && Office.context && Office.context.document) {
+      Office.context.document.settings.set(key, value);
+      Office.context.document.settings.saveAsync();
+    }
+    // Auf dem Gerät speichern
+    localStorage.setItem(`ppt_${key}`, String(value));
+  };
+
+  useEffect(() => {
+    const loadedMargins = {
+      top: loadSetting('marginTop', 0, true),
+      bottom: loadSetting('marginBottom', 0, true),
+      left: loadSetting('marginLeft', 0, true),
+      right: loadSetting('marginRight', 0, true),
+    };
+
+    setMargins(loadedMargins);
+    setDisplayMargins({
+      top: String(loadedMargins.top),
+      bottom: String(loadedMargins.bottom),
+      left: String(loadedMargins.left),
+      right: String(loadedMargins.right),
+    });
+
+    setIconUrl(loadSetting('iconUrl', '', false));
     setIsLoaded(true);
   }, []);
 
-  // NEU: 2. Effect: Lauscht auf Selektionsänderungen in PowerPoint
   useEffect(() => {
     const checkSelection = async () => {
       if (typeof PowerPoint === 'undefined') return;
@@ -79,45 +108,26 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
           const shapes = context.presentation.getSelectedShapes();
           shapes.load("items");
           await context.sync();
-
-          // Button nur aktivieren, wenn EXAKT 1 Element markiert ist
           setIsSingleShapeSelected(shapes.items.length === 1);
         });
       } catch (error) {
-        // Wird geworfen, wenn man ins Leere klickt
         setIsSingleShapeSelected(false);
       }
     };
 
-    const handleSelectionChange = () => {
-      checkSelection();
-    };
+    const handleSelectionChange = () => checkSelection();
 
     if (typeof Office !== 'undefined' && Office.context && Office.context.document) {
-      Office.context.document.addHandlerAsync(
-        Office.EventType.DocumentSelectionChanged,
-        handleSelectionChange
-      );
-      // Initialer Check beim Öffnen des Tabs
+      Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, handleSelectionChange);
       checkSelection();
     }
 
     return () => {
       if (typeof Office !== 'undefined' && Office.context && Office.context.document) {
-        Office.context.document.removeHandlerAsync(
-          Office.EventType.DocumentSelectionChanged,
-          { handler: handleSelectionChange }
-        );
+        Office.context.document.removeHandlerAsync(Office.EventType.DocumentSelectionChanged, { handler: handleSelectionChange });
       }
     };
   }, []);
-
-  const saveSetting = (key: string, value: any) => {
-    if (typeof Office !== 'undefined' && Office.context && Office.context.document) {
-      Office.context.document.settings.set(key, value);
-      Office.context.document.settings.saveAsync();
-    }
-  };
 
   const handleMarginChange = (side: keyof typeof margins, _event: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
     if (data.displayValue !== undefined) {
@@ -125,6 +135,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
     }
     if (data.value !== undefined && data.value !== null && !isNaN(data.value)) {
       setMargins(prev => ({ ...prev, [side]: data.value! }));
+      setDisplayMargins(prev => ({ ...prev, [side]: String(data.value!) }));
       saveSetting(`margin${side.charAt(0).toUpperCase() + side.slice(1)}`, data.value);
     }
   };
@@ -168,7 +179,6 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
   return (
     <div className={classes.container}>
 
-      {/* --- BEREICH 1: RÄNDER --- */}
       <div className={classes.section}>
         <div>
           <Text className={classes.heading}>Ränder</Text>
@@ -253,14 +263,13 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
             icon={<TargetRegular />}
             onClick={handleGetMarginsFromSelection}
             size="small"
-            disabled={!isSingleShapeSelected} // NEU: Button ist ausgegraut, wenn nicht exakt 1 Objekt markiert ist
+            disabled={!isSingleShapeSelected}
           >
             Von Auswahl übernehmen
           </Button>
         </div>
       </div>
 
-      {/* --- BEREICH 2: SYMBOLE --- */}
       <div className={classes.section}>
         <div>
           <Text className={classes.heading}>Symbole</Text>

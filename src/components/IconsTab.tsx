@@ -19,8 +19,8 @@ import { insertSvgIcon } from '../utils/powerpointApi';
 const useStyles = makeStyles({
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(48px, 1fr))',
-    gap: '6px',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(48px, 1fr))', // Kompaktere Spalten
+    gap: '8px',
     padding: '4px 0',
   },
   iconButton: {
@@ -28,7 +28,7 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '48px',
+    height: '48px', // Kompaktere Button-Höhe
     border: 'none',
     borderRadius: tokens.borderRadiusMedium,
     backgroundColor: tokens.colorNeutralBackground3,
@@ -38,41 +38,28 @@ const useStyles = makeStyles({
     '&:hover': {
       backgroundColor: tokens.colorNeutralBackground3Hover,
     },
-    '& svg': {
-      width: '24px',
-      height: '24px',
-    },
-    '& img': {
-      width: '24px',
-      height: '24px',
-    }
+    '& svg': { width: '24px', height: '24px' }, // Kleinere Icons
+    '& img': { width: '24px', height: '24px' }
   },
   searchBox: {
-    backgroundColor: tokens.colorNeutralBackground3, // Gleiches Grau wie die Buttons
-    borderRadius: tokens.borderRadiusMedium, // Runde Ecken
-
-    // Optional: Versteckt den farbigen Strich am unteren Rand, wenn man reinklickt
-    '&::after': {
-      display: 'none',
-    }
+    backgroundColor: tokens.colorNeutralBackground3,
+    borderRadius: tokens.borderRadiusMedium,
+    '&::after': { display: 'none' }
   },
-
   accordionHeader: {
     margin: '0px',
     '& button': {
-      minHeight: '32px', // Reduziert die Höhe des Headers
-      paddingLeft: '4px', // Reduziert den Abstand links
+      minHeight: '32px',
+      paddingLeft: '4px',
       paddingTop: '0px',
       paddingBottom: '0px',
     }
   },
-
-  // NEU: Kompaktere Abstände für den Inhalt (Panel)
   accordionPanel: {
     margin: '0px',
     paddingTop: '4px',
-    paddingBottom: '8px', // Leichter Abstand nach unten zur nächsten Kategorie
-    paddingLeft: '4px', // Reduziert den Abstand links, damit es bündig mit dem Header ist
+    paddingBottom: '8px',
+    paddingLeft: '4px',
   }
 });
 
@@ -84,32 +71,59 @@ export const IconsTab: React.FC<IconsTabProps> = ({ reloadTrigger }) => {
   const classes = useStyles();
   const [allCategories, setAllCategories] = useState<CategoryConfig[]>([]);
   const [searchText, setSearchText] = useState<string>('');
-
-  // NEU: Gesteuerter Zustand für das Accordion (Startet als leeres Array = alles geschlossen)
   const [openItems, setOpenItems] = useState<string[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const res = await fetch(`${import.meta.env.BASE_URL}config/icons.json`);
+        // 1. Standard-URL definieren
+        let configUrl = `${import.meta.env.BASE_URL}config/icons.json`;
+
+        // 2. Hybrides Laden der URL (Document -> LocalStorage)
+        let savedUrl: string | null = null;
+
+        // Zuerst im Dokument suchen
+        if (typeof Office !== 'undefined' && Office.context && Office.context.document) {
+          savedUrl = Office.context.document.settings.get('iconUrl');
+        }
+
+        // Wenn im Dokument nichts ist, im LocalStorage suchen
+        if (!savedUrl || savedUrl.trim() === '') {
+          savedUrl = localStorage.getItem('ppt_iconUrl');
+        }
+
+        // Wenn wir eine URL gefunden haben, nutzen wir sie
+        if (savedUrl && savedUrl.trim() !== '') {
+          configUrl = savedUrl;
+        }
+
+        // 3. Daten von der URL laden
+        const res = await fetch(configUrl);
         const mainConfig: MainIconConfig = await res.json();
 
         const jsonPromises = mainConfig.files.map(async (file) => {
-          const cleanPath = file.replace('./', import.meta.env.BASE_URL);
+          // Falls die eigene URL genutzt wird, müssen relative Pfade korrekt aufgelöst werden
+          const isAbsolute = file.startsWith('http://') || file.startsWith('https://');
+          const cleanPath = isAbsolute
+            ? file
+            : new URL(file, configUrl.substring(0, configUrl.lastIndexOf('/') + 1)).href;
+
           const catRes = await fetch(cleanPath);
           return catRes.json() as Promise<CategoryConfig>;
         });
 
         const jsonCategories = await Promise.all(jsonPromises);
         setAllCategories([...tsIconCategories, ...jsonCategories]);
+
       } catch (error) {
-        console.error("Fehler beim Laden der JSON-Icons:", error);
+        console.error("Fehler beim Laden der Icons (URL evtl. ungültig):", error);
+        // Fallback: Nur die fest einkompilierten TS-Icons anzeigen
         setAllCategories(tsIconCategories);
       }
     };
 
     loadData();
-  }, [reloadTrigger]);
+  }, [reloadTrigger]); // Lädt neu, wenn der Trigger aus den Settings ausgelöst wird
 
   // Filter-Logik
   const filteredCategories = allCategories.map(cat => {
@@ -119,17 +133,15 @@ export const IconsTab: React.FC<IconsTabProps> = ({ reloadTrigger }) => {
       const matchKeyword = icon.keywords.some(kw => kw.toLowerCase().includes(term));
       return matchName || matchKeyword;
     });
-
     return { ...cat, icons: filteredIcons };
   }).filter(cat => cat.icons.length > 0);
 
-  // NEU: Such-Handler (Öffnet Kategorien automatisch)
+  // Such-Handler (Öffnet Kategorien automatisch)
   const handleSearchChange = (_event: SearchBoxChangeEvent, data: { value?: string }) => {
     const text = data.value || '';
     setSearchText(text);
 
     if (text.trim() !== '') {
-      // Wenn gesucht wird: Finde alle Kategorien, die Treffer haben, und öffne sie
       const matchingCategories = allCategories
         .filter(cat => {
           const term = text.toLowerCase();
@@ -139,28 +151,24 @@ export const IconsTab: React.FC<IconsTabProps> = ({ reloadTrigger }) => {
           );
         })
         .map(cat => cat.category);
-
       setOpenItems(matchingCategories);
     } else {
-      // Wenn die Suche geleert wird: Schließe alle Accordions wieder
       setOpenItems([]);
     }
   };
 
-  // NEU: Manueller Klick auf einen Accordion-Header
+  // Manueller Klick auf einen Accordion-Header
   const handleToggle = (_event: AccordionToggleEvent, data: AccordionToggleData) => {
     setOpenItems(data.openItems as string[]);
   };
 
-  // NEU: Klick auf ein Icon (Einfügen in PowerPoint)
+  // Klick auf ein Icon (Einfügen in PowerPoint)
   const handleIconClick = async (svgData: string | string[]) => {
     const svgString = Array.isArray(svgData) ? svgData.join('\n') : svgData;
 
     if (svgString.trim().startsWith('<svg')) {
-      // Inline SVG direkt einfügen
       await insertSvgIcon(svgString);
     } else {
-      // Falls es eine URL ist, laden wir den SVG-Code erst herunter
       try {
         const res = await fetch(svgString);
         const text = await res.text();
@@ -171,6 +179,7 @@ export const IconsTab: React.FC<IconsTabProps> = ({ reloadTrigger }) => {
     }
   };
 
+  // Hilfsfunktion zum Rendern des SVGs (Inline oder URL)
   const renderSvg = (svgData: string | string[]) => {
     const svgString = Array.isArray(svgData) ? svgData.join('\n') : svgData;
     if (svgString.trim().startsWith('<svg')) {
@@ -183,8 +192,9 @@ export const IconsTab: React.FC<IconsTabProps> = ({ reloadTrigger }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
       <SearchBox
+        className={classes.searchBox}
         appearance="filled-darker"
-        placeholder="Symbole suchen..."
+        placeholder="Icons suchen..."
         onChange={handleSearchChange}
       />
 
@@ -202,8 +212,7 @@ export const IconsTab: React.FC<IconsTabProps> = ({ reloadTrigger }) => {
           >
             {filteredCategories.map((cat, index) => (
               <AccordionItem value={cat.category} key={index}>
-                {/* NEU: <b> Tag macht den Header fett */}
-                <AccordionHeader  className={classes.accordionHeader}>
+                <AccordionHeader className={classes.accordionHeader}>
                   <b>{cat.category}</b>
                 </AccordionHeader>
                 <AccordionPanel className={classes.accordionPanel}>
