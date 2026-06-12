@@ -10,7 +10,7 @@ import {
   type Theme
 } from '@fluentui/react-components';
 import { SettingsRegular } from '@fluentui/react-icons';
-import { TemplatesTab } from './components/TemplatesTab';
+import { LayoutTab } from './components/LayoutTab';
 import { SettingsTab } from './components/SettingsTab';
 import { IconsTab } from './components/IconsTab';
 
@@ -26,6 +26,7 @@ const powerPointTheme: Theme = {
   fontSizeBase300: "12px",
 };
 
+
 // 2. Custom Styles für unsere eigene Button-Navigation
 const useStyles = makeStyles({
   navBar: {
@@ -36,44 +37,50 @@ const useStyles = makeStyles({
   },
   navButton: {
     fontSize: '11px',
-    fontWeight: 'normal',
-    paddingTop: '4px',
-    paddingBottom: '4px',
-    paddingLeft: '6px !important',
-    paddingRight: '6px !important',
-    minWidth: '24px',
-    minHeight: '24px',
+    fontWeight: 'normal !important', // Immer normal (nicht fett)
+    paddingTop: '2px',
+    paddingBottom: '2px',
+    paddingLeft: '8px !important',
+    paddingRight: '8px !important',
+    minWidth: 'auto !important',
+    minHeight: '26px',
     borderRadius: tokens.borderRadiusMedium,
 
-    // Standard-Zustand (Unselected)
-    color: tokens.colorNeutralForeground2, // Grau
-    backgroundColor: 'transparent',
+    // 1. NORMAL: Dunkelgrauer Text, kein Hintergrund, unsichtbarer Rahmen
+    color: `${tokens.colorNeutralForeground1} !important`, // Dunkelgrau/Fast Schwarz
+    backgroundColor: 'transparent !important',
+    border: '1px solid transparent !important', // Verhindert das "Zucken" beim Hovern
 
-    // Hover für UNSELECTED
+    // 2. HOVER (Unselected): Hellgrauer Hintergrund, mittelgrauer Rahmen
     '&:hover': {
-      fontWeight: 'bold !important',
-      color: `${tokens.colorNeutralForeground1} !important`, // Schwarz
-      backgroundColor: 'transparent !important', // Kein grauer Hintergrund beim Hover
+      backgroundColor: `${tokens.colorNeutralBackground1Hover} !important`, // Hellgrau
+      border: `1px solid ${tokens.colorNeutralStroke1} !important`, // Mittelgrauer Rahmen
+      color: `${tokens.colorNeutralForeground1} !important`,
     },
   },
 
   // Diese Klasse wird nur angehängt, wenn der Button aktiv ist
   navButtonActive: {
-    fontWeight: 'bold !important',
-    backgroundColor: `${tokens.colorBrandBackground2} !important`, // Heller Akzent
-    color: `${tokens.colorBrandForeground1} !important`, // Akzentfarbe (Orange)
 
-    // Hover für SELECTED (bleibt exakt gleich)
+    fontWeight: 'bold !important', // Immer normal (nicht fett)
+    // 3. SELEKTIERT: Mittelgrauer Hintergrund, Rahmen & Text in Akzentfarbe
+    backgroundColor: `${tokens.colorNeutralBackground4} !important`, // Mittelgrau
+    border: `1px solid ${tokens.colorBrandStroke1} !important`, // Rahmen in Akzentfarbe (Orange)
+    color: `${tokens.colorBrandForeground1} !important`, // Text in Akzentfarbe
+
+    // Hover für SELECTED (damit es beim Drüberfahren nicht zurück auf das graue Hover springt)
     '&:hover': {
-      backgroundColor: `${tokens.colorBrandBackground2} !important`,
+      backgroundColor: `${tokens.colorNeutralBackground3} !important`,
+      border: `1px solid ${tokens.colorBrandStroke1} !important`,
       color: `${tokens.colorBrandForeground1} !important`,
     }
   },
 
   settingsButton: {
-    marginLeft: 'auto', // Drückt den Settings-Button nach rechts
+    marginLeft: 'auto',
   }
 });
+
 
 export const App: React.FC = () => {
   const classes = useStyles();
@@ -103,7 +110,7 @@ export const App: React.FC = () => {
             )}
             onClick={() => setSelectedValue('templates')}
           >
-            Templates
+            Layout
           </Button>
 
           <Button
@@ -135,7 +142,7 @@ export const App: React.FC = () => {
 
         {/* Content-Bereich */}
         <div style={{ flex: 1, marginTop: '16px', overflow: 'hidden' }}>
-          {selectedValue === 'templates' && <TemplatesTab />}
+          {selectedValue === 'templates' && <LayoutTab />}
           {selectedValue === 'icons' && <IconsTab reloadTrigger={reloadTrigger} />}
           {selectedValue === 'settings' && <SettingsTab onReloadIcons={handleReloadIcons} />}
         </div>

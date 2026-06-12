@@ -16,6 +16,8 @@ import { type CategoryConfig, type MainIconConfig } from '../types/iconConfig';
 import { tsIconCategories } from '../config/icons';
 import { insertSvgIcon } from '../utils/powerpointApi';
 
+import { loadSetting } from '../utils/settings';
+
 const useStyles = makeStyles({
   grid: {
     display: 'grid',
@@ -79,20 +81,7 @@ export const IconsTab: React.FC<IconsTabProps> = ({ reloadTrigger }) => {
         // 1. Standard-URL definieren
         let configUrl = `${import.meta.env.BASE_URL}config/icons.json`;
 
-        // 2. Hybrides Laden der URL (Document -> LocalStorage)
-        let savedUrl: string | null = null;
-
-        // Zuerst im Dokument suchen
-        if (typeof Office !== 'undefined' && Office.context && Office.context.document) {
-          savedUrl = Office.context.document.settings.get('iconUrl');
-        }
-
-        // Wenn im Dokument nichts ist, im LocalStorage suchen
-        if (!savedUrl || savedUrl.trim() === '') {
-          savedUrl = localStorage.getItem('ppt_iconUrl');
-        }
-
-        // Wenn wir eine URL gefunden haben, nutzen wir sie
+        const savedUrl = loadSetting('iconUrl', '', false);
         if (savedUrl && savedUrl.trim() !== '') {
           configUrl = savedUrl;
         }
