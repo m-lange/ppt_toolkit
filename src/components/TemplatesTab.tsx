@@ -8,7 +8,7 @@ export const TemplatesTab: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* SearchBox (Platzhalter ohne Logik) */}
       <Field label="Vorlagen durchsuchen">
-        <SearchBox placeholder="Suche..." />
+        <SearchBox placeholder="Suche..." size="small"/>
       </Field>
 
       {/* Action Button */}

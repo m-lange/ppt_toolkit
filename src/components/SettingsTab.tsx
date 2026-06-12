@@ -13,6 +13,7 @@ export const SettingsTab: React.FC = () => {
           appearance="secondary"
           icon={<SettingsRegular />}
           onClick={insertGreenCircle}
+          size="small"
         >
           Grünen Kreis einfügen
         </Button>
