@@ -119,7 +119,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
   }, []);
 
 // Verarbeitet JEDE Änderung (Tippen UND Pfeil-Klicks)
-  const handleMarginChange = (side: keyof typeof margins, event: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
+  const handleMarginChange = (side: keyof typeof margins, _event: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
     // 1. Wenn der Nutzer tippt (data.value ist meist undefined, da noch keine valide Zahl)
     if (data.displayValue !== undefined) {
       setDisplayMargins(prev => ({ ...prev, [side]: data.displayValue! }));
@@ -198,7 +198,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onReloadIcons }) => {
             <SpinButton
               value={margins.top}
               displayValue={displayMargins.top}
-              onChange={(e, d) => handleMarginChange('top', e, d)}<-- NEU
+              onChange={(e, d) => handleMarginChange('top', e, d)}
               onBlur={() => handleMarginBlur('top')}
               className={classes.spinButton}
               appearance="filled-darker"
