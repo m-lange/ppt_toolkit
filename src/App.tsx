@@ -16,30 +16,29 @@ import { TemplatesTab } from './components/TemplatesTab';
 import { SettingsTab } from './components/SettingsTab';
 import { IconsTab } from './components/IconsTab';
 
-// 1. PowerPoint Brand Colors (Orange/Rot)
-const powerPointBrand: BrandVariants = {
-  10: "#040100",
-  20: "#1F0802",
-  30: "#350B02",
-  40: "#480D02",
-  50: "#5C1002",
-  60: "#701202",
-  70: "#851502",
-  80: "#9B1702",
-  90: "#B21A02",
-  100: "#C43E1C", // PowerPoint Hauptfarbe
-  110: "#D05232",
-  120: "#DB6547",
-  130: "#E4785D",
-  140: "#EC8B73",
-  150: "#F39E8A",
-  160: "#F8B1A1",
+
+const brandTheme: BrandVariants = {
+  10: "#020401",
+  20: "#101C0F",
+  30: "#152F17",
+  40: "#173D1C",
+  50: "#194B20",
+  60: "#1A5A25",
+  70: "#1A692A",
+  80: "#19782E",
+  90: "#168833",
+  100: "#119938",
+  110: "#07A93C",
+  120: "#34B84E",
+  130: "#60C46B",
+  140: "#82D087",
+  150: "#A2DCA3",
+  160: "#BFE7BF"
 };
 
 // 2. Theme anpassen: Globale Schriftgröße auf 12px setzen
 const powerPointTheme: Theme = {
-  ...createLightTheme(powerPointBrand),
-  // Base300 ist die Standard-Schriftgröße für fast alle Fluent UI Texte
+  ...createLightTheme(brandTheme),
   fontSizeBase300: "12px",
 };
 
@@ -50,42 +49,34 @@ const useStyles = makeStyles({
     columnGap: '4px',
   },
   customTab: {
-    // 1. Globale Typografie für den Tab erzwingen
     fontSize: '11px',
     fontWeight: 'bold',
-
-    // 2. Abstände oben/unten reduzieren (kompakterer Look)
     paddingTop: '2px',
     paddingBottom: '2px',
     paddingLeft: '12px',
     paddingRight: '12px',
-    minHeight: '26px', // Vorher 32px
+    minHeight: '26px',
     borderRadius: tokens.borderRadiusMedium,
 
-    // 3. Standard-Zustand (Unselected)
     color: tokens.colorNeutralForeground2,
     backgroundColor: 'transparent',
 
-    // Versteckt den standardmäßigen Unterstrich
     '&::after': {
-      display: 'none',
+      display: 'none !important',
     },
 
-    // 4. Hover-Zustand für UNSELECTED Tabs
     '&:hover': {
-      backgroundColor: tokens.colorNeutralBackground1Hover,
-      color: tokens.colorNeutralForeground2Hover, // Erzwingt, dass die Farbe beim Hovern dunkelgrau bleibt
+      color: tokens.colorNeutralForeground1,
+      backgroundColor: 'transparent',
     },
 
-    // 5. Zustand für SELECTED Tabs
     '&[aria-selected="true"]': {
       backgroundColor: tokens.colorBrandBackground2,
       color: tokens.colorBrandForeground1,
     },
 
-    // 6. Hover-Zustand für SELECTED Tabs (damit es beim Drüberfahren stimmig bleibt)
     '&[aria-selected="true"]:hover': {
-      backgroundColor: tokens.colorBrandBackground2Hover,
+      backgroundColor: tokens.colorBrandBackground2,
       color: tokens.colorBrandForeground1,
     },
   }

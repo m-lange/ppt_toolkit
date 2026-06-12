@@ -55,6 +55,24 @@ const useStyles = makeStyles({
     '&::after': {
       display: 'none',
     }
+  },
+
+  accordionHeader: {
+    margin: '0px',
+    '& button': {
+      minHeight: '32px', // Reduziert die Höhe des Headers
+      paddingLeft: '4px', // Reduziert den Abstand links
+      paddingTop: '0px',
+      paddingBottom: '0px',
+    }
+  },
+
+  // NEU: Kompaktere Abstände für den Inhalt (Panel)
+  accordionPanel: {
+    margin: '0px',
+    paddingTop: '4px',
+    paddingBottom: '8px', // Leichter Abstand nach unten zur nächsten Kategorie
+    paddingLeft: '4px', // Reduziert den Abstand links, damit es bündig mit dem Header ist
   }
 });
 
@@ -181,8 +199,10 @@ export const IconsTab: React.FC = () => {
             {filteredCategories.map((cat, index) => (
               <AccordionItem value={cat.category} key={index}>
                 {/* NEU: <b> Tag macht den Header fett */}
-                <AccordionHeader><b>{cat.category}</b></AccordionHeader>
-                <AccordionPanel>
+                <AccordionHeader  className={classes.accordionHeader}>
+                  <b>{cat.category}</b>
+                </AccordionHeader>
+                <AccordionPanel className={classes.accordionPanel}>
                   <div className={classes.grid}>
                     {cat.icons.map((icon, i) => (
                       <Tooltip content={icon.name} relationship="label" key={i}>
