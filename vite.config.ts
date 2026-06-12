@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineConfig({
-  base: '/<YOUR_REPO_NAME>/',
+  base: '/ppt_toolkit/',
   plugins: [react(), basicSsl()],
   server: {
     port: 3000,

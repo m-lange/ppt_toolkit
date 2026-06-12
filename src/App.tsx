@@ -4,9 +4,10 @@ import {
   webLightTheme,
   TabList,
   Tab,
-  SelectTabData,
-  SelectTabEvent
+  type SelectTabData,
+  type SelectTabEvent
 } from '@fluentui/react-components';
+
 import { TemplatesTab } from './components/TemplatesTab';
 import { SettingsTab } from './components/SettingsTab';
 

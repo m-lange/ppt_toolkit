@@ -6,7 +6,6 @@
   xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
   xsi:type="TaskPaneApp">
 
-  <!-- UUID generieren und hier einsetzen -->
   <Id>b50b55de-6435-4375-8027-e89aabcb583f</Id>
 
   <Version>1.0.0.0</Version>
@@ -14,13 +13,12 @@
   <DefaultLocale>de-DE</DefaultLocale>
   <DisplayName DefaultValue="PPT Toolkit" />
   <Description DefaultValue="Schneller designen, smarter präsentieren."/>
-  <IconUrl DefaultValue="https://<YOUR_GITHUB_PAGES_URL>/assets/icon-64.png" />
+  <IconUrl DefaultValue="https://m-lange.github.io/ppt_toolkit/assets/icon-64.png" />
 
   <Hosts>
     <Host Name="Presentation" />
   </Hosts>
 
-  <!-- Minimale API Voraussetzungen (1.4 ist wichtig für Shapes in PowerPoint.run) -->
   <Requirements>
     <Sets DefaultMinVersion="1.4">
       <Set Name="PowerPointApi" MinVersion="1.4"/>
@@ -28,7 +26,7 @@
   </Requirements>
 
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://<YOUR_GITHUB_PAGES_URL>/index.html" />
+    <SourceLocation DefaultValue="https://m-lange.github.io/ppt_toolkit/index.html" />
   </DefaultSettings>
 
   <Permissions>ReadWriteDocument</Permissions>
@@ -70,12 +68,12 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://<YOUR_GITHUB_PAGES_URL>/assets/icon-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://<YOUR_GITHUB_PAGES_URL>/assets/icon-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://<YOUR_GITHUB_PAGES_URL>/assets/icon-80.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="https://m-lange.github.io/ppt_toolkit/assets/icon-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://m-lange.github.io/ppt_toolkit/assets/icon-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://m-lange.github.io/ppt_toolkit/assets/icon-80.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="TaskpaneUrl" DefaultValue="https://<YOUR_GITHUB_PAGES_URL>/index.html" />
+        <bt:Url id="TaskpaneUrl" DefaultValue="https://m-lange.github.io/ppt_toolkit/index.html" />
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="CommandsGroupLabel" DefaultValue="Templates" />
