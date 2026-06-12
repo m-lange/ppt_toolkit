@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
-  SearchBox, Button, Field, makeStyles, mergeClasses, tokens, Text, Divider, Checkbox, Label
+  Button, makeStyles, tokens, Text, Divider, Label
 } from '@fluentui/react-components';
 import {
-  ShapesRegular, MaximizeRegular, CodeRegular, AddRegular,
+  AddRegular,
   AlignLeftRegular, AlignCenterHorizontalRegular, AlignRightRegular,
   AlignTopRegular, AlignCenterVerticalRegular, AlignBottomRegular,
   AlignSpaceEvenlyHorizontalRegular, AlignSpaceEvenlyVerticalRegular // NEU: Icons fürs Verteilen
 } from '@fluentui/react-icons';
-import { insertBlueRectangle, showSlideDimensions, exportSelectedShapeToJson } from '../utils/powerpointApi';
 import { SpinButton } from './SpinButton';
 import { ToggleSwitch } from './ToggleSwitch';
 
