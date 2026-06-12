@@ -76,7 +76,11 @@ const useStyles = makeStyles({
   }
 });
 
-export const IconsTab: React.FC = () => {
+interface IconsTabProps {
+  reloadTrigger: number;
+}
+
+export const IconsTab: React.FC<IconsTabProps> = ({ reloadTrigger }) => {
   const classes = useStyles();
   const [allCategories, setAllCategories] = useState<CategoryConfig[]>([]);
   const [searchText, setSearchText] = useState<string>('');
@@ -105,7 +109,7 @@ export const IconsTab: React.FC = () => {
     };
 
     loadData();
-  }, []);
+  }, [reloadTrigger]);
 
   // Filter-Logik
   const filteredCategories = allCategories.map(cat => {

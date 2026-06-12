@@ -78,6 +78,13 @@ export const App: React.FC = () => {
   const classes = useStyles();
   const [selectedValue, setSelectedValue] = useState<string>('templates');
 
+  const [reloadTrigger, setReloadTrigger] = useState<number>(0);
+
+  const handleReloadIcons = () => {
+    setReloadTrigger(prev => prev + 1);
+  };
+
+
   return (
     <FluentProvider theme={powerPointTheme}>
       <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', height: '100vh', boxSizing: 'border-box' }}>
@@ -128,8 +135,8 @@ export const App: React.FC = () => {
         {/* Content-Bereich */}
         <div style={{ flex: 1, marginTop: '16px', overflow: 'hidden' }}>
           {selectedValue === 'templates' && <TemplatesTab />}
-          {selectedValue === 'icons' && <IconsTab />}
-          {selectedValue === 'settings' && <SettingsTab />}
+          {selectedValue === 'icons' && <IconsTab reloadTrigger={reloadTrigger} />}
+          {selectedValue === 'settings' && <SettingsTab onReloadIcons={handleReloadIcons} />}
         </div>
 
       </div>
