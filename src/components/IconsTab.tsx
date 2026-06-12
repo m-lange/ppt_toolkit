@@ -7,12 +7,15 @@ import {
   AccordionPanel,
   makeStyles,
   tokens,
-  Tooltip
+  Tooltip,
+  type AccordionToggleEvent,
+  type AccordionToggleData,
+  type SearchBoxChangeEvent
 } from '@fluentui/react-components';
 import { type CategoryConfig, type MainIconConfig } from '../types/iconConfig';
 import { tsIconCategories } from '../config/icons';
+import { insertSvgIcon } from '../utils/powerpointApi';
 
-// Styling für das Icon-Grid und die flachen Buttons
 const useStyles = makeStyles({
   grid: {
     display: 'grid',
@@ -28,12 +31,12 @@ const useStyles = makeStyles({
     height: '60px',
     border: 'none',
     borderRadius: tokens.borderRadiusMedium,
-    backgroundColor: tokens.colorNeutralBackground3, // Leicht grauer Hintergrund
+    backgroundColor: tokens.colorNeutralBackground3,
     color: tokens.colorNeutralForeground1,
     cursor: 'pointer',
     transition: 'background-color 0.2s',
     '&:hover': {
-      backgroundColor: tokens.colorNeutralBackground3Hover, // Dunkler beim Hover
+      backgroundColor: tokens.colorNeutralBackground3Hover,
     },
     '& svg': {
       width: '32px',
@@ -51,7 +54,9 @@ export const IconsTab: React.FC = () => {
   const [allCategories, setAllCategories] = useState<CategoryConfig[]>([]);
   const [searchText, setSearchText] = useState<string>('');
 
-  // Daten beim ersten Rendern laden und zusammenführen
+  // NEU: Gesteuerter Zustand für das Accordion (Startet als leeres Array = alles geschlossen)
+  const [openItems, setOpenItems] = useState<string[]>([]);
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -65,12 +70,9 @@ export const IconsTab: React.FC = () => {
         });
 
         const jsonCategories = await Promise.all(jsonPromises);
-
-        // TS-Daten und JSON-Daten kombinieren
         setAllCategories([...tsIconCategories, ...jsonCategories]);
       } catch (error) {
         console.error("Fehler beim Laden der JSON-Icons:", error);
-        // Falls JSON fehlschlägt, zumindest TS-Icons anzeigen
         setAllCategories(tsIconCategories);
       }
     };
@@ -79,21 +81,67 @@ export const IconsTab: React.FC = () => {
   }, []);
 
   // Filter-Logik
-  const filteredCategories = allCategories.map(category => {
+  const filteredCategories = allCategories.map(cat => {
     const term = searchText.toLowerCase();
-    const filteredIcons = category.icons.filter(icon => {
+    const filteredIcons = cat.icons.filter(icon => {
       const matchName = icon.name.toLowerCase().includes(term);
       const matchKeyword = icon.keywords.some(kw => kw.toLowerCase().includes(term));
       return matchName || matchKeyword;
     });
 
-    return { ...category, icons: filteredIcons };
-  }).filter(category => category.icons.length > 0); // Leere Kategorien ausblenden
+    return { ...cat, icons: filteredIcons };
+  }).filter(cat => cat.icons.length > 0);
 
-  // Hilfsfunktion zum Rendern des SVGs (Inline oder URL)
-  const renderSvg = (svgData: string | string[]) => {
+  // NEU: Such-Handler (Öffnet Kategorien automatisch)
+  const handleSearchChange = (_event: SearchBoxChangeEvent, data: { value?: string }) => {
+    const text = data.value || '';
+    setSearchText(text);
+
+    if (text.trim() !== '') {
+      // Wenn gesucht wird: Finde alle Kategorien, die Treffer haben, und öffne sie
+      const matchingCategories = allCategories
+        .filter(cat => {
+          const term = text.toLowerCase();
+          return cat.icons.some(icon =>
+            icon.name.toLowerCase().includes(term) ||
+            icon.keywords.some(kw => kw.toLowerCase().includes(term))
+          );
+        })
+        .map(cat => cat.category);
+
+      setOpenItems(matchingCategories);
+    } else {
+      // Wenn die Suche geleert wird: Schließe alle Accordions wieder
+      setOpenItems([]);
+    }
+  };
+
+  // NEU: Manueller Klick auf einen Accordion-Header
+  const handleToggle = (_event: AccordionToggleEvent, data: AccordionToggleData) => {
+    setOpenItems(data.openItems as string[]);
+  };
+
+  // NEU: Klick auf ein Icon (Einfügen in PowerPoint)
+  const handleIconClick = async (svgData: string | string[]) => {
     const svgString = Array.isArray(svgData) ? svgData.join('\n') : svgData;
 
+    if (svgString.trim().startsWith('<svg')) {
+      // Inline SVG direkt einfügen
+      await insertSvgIcon(svgString);
+    } else {
+      // Falls es eine URL ist, laden wir den SVG-Code erst herunter
+      try {
+        const res = await fetch(svgString);
+        const text = await res.text();
+        await insertSvgIcon(text);
+      } catch (err) {
+        console.error("Fehler beim Laden des SVGs von URL:", err);
+      }
+    }
+  };
+
+  const renderSvg = (svgData: string | string[]) => {
+    const svgString = Array.isArray(svgData) ? svgData.join('\n') : svgData;
     if (svgString.trim().startsWith('<svg')) {
       return <div dangerouslySetInnerHTML={{ __html: svgString }} style={{ display: 'flex' }} />;
     } else {
@@ -103,31 +151,35 @@ export const IconsTab: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
-      {/* Underline Searchbar */}
       <SearchBox
         appearance="underline"
         placeholder="Icons suchen..."
-        onChange={(_e, data) => setSearchText(data.value || '')}
+        onChange={handleSearchChange}
       />
 
-      {/* Accordion für die Kategorien */}
       <div style={{ overflowY: 'auto', flex: 1, paddingRight: '4px' }}>
         {filteredCategories.length === 0 ? (
           <div style={{ textAlign: 'center', marginTop: '20px', color: tokens.colorNeutralForeground3 }}>
             Keine Icons gefunden.
           </div>
         ) : (
-          <Accordion multiple collapsible defaultOpenItems={filteredCategories.map(c => c.category)}>
-            {filteredCategories.map((category, index) => (
-              <AccordionItem value={category.category} key={index}>
-                <AccordionHeader>{category.category}</AccordionHeader>
+          <Accordion
+            multiple
+            collapsible
+            openItems={openItems}
+            onToggle={handleToggle}
+          >
+            {filteredCategories.map((cat, index) => (
+              <AccordionItem value={cat.category} key={index}>
+                {/* NEU: <b> Tag macht den Header fett */}
+                <AccordionHeader><b>{cat.category}</b></AccordionHeader>
                 <AccordionPanel>
                   <div className={classes.grid}>
-                    {category.icons.map((icon, i) => (
+                    {cat.icons.map((icon, i) => (
                       <Tooltip content={icon.name} relationship="label" key={i}>
                         <button
                           className={classes.iconButton}
-                          onClick={() => console.log(`Icon ${icon.name} geklickt!`)}
+                          onClick={() => handleIconClick(icon.svg)}
                         >
                           {renderSvg(icon.svg)}
                         </button>
