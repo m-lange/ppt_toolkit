@@ -56,9 +56,19 @@ export const App: React.FC<AppProps> = ({ }) => {
       <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', height: '100vh', boxSizing: 'border-box' }}>
 
         {/* size="small" macht die Tabs kompakter */}
-        <TabList selectedValue={selectedValue} onTabSelect={onTabSelect} size="small">
+        <TabList
+          selectedValue={selectedValue}
+          onTabSelect={onTabSelect}
+          size="small"
+          style={{ width: '100%' }}
+        >
           <Tab value="templates">Templates</Tab>
-          <Tab value="settings" icon={<SettingsRegular />} aria-label="Settings" />
+          <Tab
+            value="settings"
+            icon={<SettingsRegular />}
+            aria-label="Settings"
+            style={{ marginLeft: 'auto' }}
+          />
         </TabList>
 
         <div style={{ flex: 1, marginTop: '16px' }}>
