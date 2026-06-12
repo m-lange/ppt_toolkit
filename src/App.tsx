@@ -9,6 +9,9 @@ import {
   type SelectTabData,
   type SelectTabEvent
 } from '@fluentui/react-components';
+
+import { SettingsRegular } from '@fluentui/react-icons';
+
 import { TemplatesTab } from './components/TemplatesTab';
 import { SettingsTab } from './components/SettingsTab';
 
@@ -34,23 +37,17 @@ const powerPointBrand: BrandVariants = {
 
 
 const powerPointTheme: Theme = {
-  ...createLightTheme(powerPointBrand),
-  fontSizeBase100: "8px",
-  fontSizeBase200: "10px",
-  fontSizeBase300: "12px",
-  fontSizeBase400: "14px",
-  fontSizeBase500: "16px",
-  fontSizeBase600: "18px",
+  ...createLightTheme(powerPointBrand)
 };
 
 interface AppProps {
   isOffice?: boolean;
 }
 
-export const App: React.FC<AppProps> = ({ isOffice }) => {
+export const App: React.FC<AppProps> = ({ }) => {
   const [selectedValue, setSelectedValue] = useState<string>('templates');
 
-  const onTabSelect = (event: SelectTabEvent, data: SelectTabData) => {
+  const onTabSelect = (_event: SelectTabEvent, data: SelectTabData) => {
     setSelectedValue(data.value as string);
   };
 
@@ -61,7 +58,7 @@ export const App: React.FC<AppProps> = ({ isOffice }) => {
         {/* size="small" macht die Tabs kompakter */}
         <TabList selectedValue={selectedValue} onTabSelect={onTabSelect} size="small">
           <Tab value="templates">Templates</Tab>
-          <Tab value="settings">Settings</Tab>
+          <Tab value="settings" icon={<SettingsRegular />} aria-label="Settings" />
         </TabList>
 
         <div style={{ flex: 1, marginTop: '16px' }}>
