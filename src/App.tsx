@@ -39,9 +39,10 @@ const useStyles = makeStyles({
     fontWeight: 'normal',
     paddingTop: '2px',
     paddingBottom: '2px',
-    paddingLeft: '6px',
-    paddingRight: '6px',
-    minHeight: '26px',
+    paddingLeft: '4px !important',
+    paddingRight: '4px !important',
+    minWidth: 'auto !important',
+    minHeight: 'auto !important',
     borderRadius: tokens.borderRadiusMedium,
 
     // Standard-Zustand (Unselected)
