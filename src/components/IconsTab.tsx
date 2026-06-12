@@ -20,7 +20,7 @@ const useStyles = makeStyles({
   grid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))',
-    gap: '8px',
+    gap: '6px',
     padding: '4px 0',
   },
   iconButton: {
@@ -28,7 +28,7 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '60px',
+    height: '50px',
     border: 'none',
     borderRadius: tokens.borderRadiusMedium,
     backgroundColor: tokens.colorNeutralBackground3,
@@ -39,12 +39,12 @@ const useStyles = makeStyles({
       backgroundColor: tokens.colorNeutralBackground3Hover,
     },
     '& svg': {
-      width: '32px',
-      height: '32px',
+      width: '24px',
+      height: '24px',
     },
     '& img': {
-      width: '32px',
-      height: '32px',
+      width: '24px',
+      height: '24px',
     }
   },
   searchBox: {
